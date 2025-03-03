@@ -1,10 +1,11 @@
 package uk.ac.ucl.model;
 
-import java.io.Reader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -16,7 +17,7 @@ public class Model
 
   public List<String> getPatientNames()
   {
-    return readFile("data/patients100.csv");
+    return readFile("data/NoteNames.csv");
   }
 
   // This method illustrates how to read csv data from a file.

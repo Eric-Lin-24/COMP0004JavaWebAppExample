@@ -5,6 +5,23 @@
   <title>A Patient</title>
 </head>
 <body>
-  <p>Something about a patient.</p>
+  
+  <h3>Patient Notes:</h3>
+  <iframe id="fileFrame" width="100%" height="200"></iframe>
+
+  <script>
+    function getQueryParam(param) {
+      var urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    window.onload = function() {
+      var fileName = getQueryParam('file');
+      if (fileName) {
+        document.getElementById('fileFrame').src = fileName;
+      }
+    }
+  </script>
+
 </body>
 </html>

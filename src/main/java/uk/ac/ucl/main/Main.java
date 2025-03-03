@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.WebResourceRoot;
@@ -14,7 +18,7 @@ import org.apache.catalina.webresources.StandardRoot;
 
 public class Main
 {
-  private static final int DEFAULT_PORT = 8080;
+  private static final int DEFAULT_PORT = 9090;
   private static final String DEFAULT_WEBAPP_DIR = "src/main/webapp/";
   private static final String DEFAULT_TARGET_CLASSES = "target/classes";
   private static final String WEB_INF_CLASSES = "/WEB-INF/classes";

@@ -1,0 +1,2 @@
+Mar 03, 2025 2:07:16 PM uk.ac.ucl.main.Main main
+INFO: Server started successfully on port 9090

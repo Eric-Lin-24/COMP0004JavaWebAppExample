@@ -15,7 +15,7 @@
       List<String> patients = (List<String>) request.getAttribute("patientNames");
       for (String patient : patients)
       {
-        String href = "dummypage.html?file=" + patient + ".txt";
+        String href = "dummypage.html";
     %>
     <li><a href="<%=href%>"><%=patient%></a>
     </li>
