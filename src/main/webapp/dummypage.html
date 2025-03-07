@@ -2,12 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>A Patient</title>
+  <title id="pageTitle">A Patient</title>
 </head>
 <body>
   
-  <h3>Patient Notes:</h3>
-  <iframe id="fileFrame" width="100%" height="200"></iframe>
+  <h3 id="header"></h3>
+  <h3>Change Note Title</h3>
+  <input type="text" id="newNoteTitle" placeholder="Enter new note title">
+  <button onclick="changeNoteTitle()">Change Title</button>
+  <textarea id="fileContent" style="width: 100%; height: 200px;"></textarea>
+  <button onclick="saveFile()">Save</button>
+  <div id="imagesContainer"></div>
+
+  <h3>Upload Image</h3>
+  <input type="file" id="imageUpload" accept="image/*">
+  <button onclick="uploadImage()">Upload Image</button>
 
   <script>
     function getQueryParam(param) {
@@ -15,11 +24,133 @@
       return urlParams.get(param);
     }
 
+    function changeNoteTitle() {
+      var oldNoteTitle = document.getElementById('header').innerText;
+      var newNoteTitle = document.getElementById('newNoteTitle').value.trim();
+      if (!newNoteTitle) {
+        alert("Please enter a new note title.");
+        return;
+      }
+
+      fetch('/changeNoteTitle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldNoteTitle: oldNoteTitle, newNoteTitle: newNoteTitle })
+      }).then(response => response.text())
+        .then(result => {
+            console.log("Response:", result);
+            alert(result);
+            if (result === "Note title changed successfully.") {
+              document.getElementById('header').innerText = newNoteTitle;
+              document.getElementById('pageTitle').innerText = newNoteTitle;
+              document.title = newNoteTitle;
+              displayImages(newNoteTitle);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error changing note title: " + error);
+        });
+    }
+
+    function displayImages(noteTitle) {
+      fetch('/listImages?noteTitle=' + encodeURIComponent(noteTitle))
+        .then(response => response.json())
+        .then(imageFiles => {
+          var imagesContainer = document.getElementById('imagesContainer');
+          imagesContainer.innerHTML = ''; // Clear previous images
+
+          imageFiles.forEach(file => {
+            var img = document.createElement('img');
+            img.src = file;
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            imagesContainer.appendChild(img);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching images:", error);
+        });
+    }
+
     window.onload = function() {
       var fileName = getQueryParam('file');
       if (fileName) {
-        document.getElementById('fileFrame').src = fileName;
+        var noteName = fileName.replace('.txt', ''); // Remove the .txt extension
+        document.getElementById('header').innerText = noteName;
+        document.getElementById('pageTitle').innerText = noteName; // Set the title to the note name
+        document.title = noteName;
+        console.log("Fetching file:", fileName); // Log the file name being fetched
+        fetch('/NoteData/' + noteName + '/' + fileName)
+        .then(response => {
+          if (!response.ok) {
+            return "";
+          }
+          return response.text();
+        })
+        .then(text => {
+          document.getElementById('fileContent').value = text;
+        })
+        .catch(error => {
+          console.error("Error fetching file:", error);
+          alert("Error fetching file: " + error.message);
+        });
+        // Display images for the note
+        displayImages(noteName);
+
+        // Start polling for new images
+        setInterval(() => {
+          displayImages(noteName);
+        }, 5000); // Poll every 5 seconds
       }
+    }
+
+    function saveFile() {
+      var fileName = getQueryParam('file');
+      var fileContent = document.getElementById('fileContent').value;
+
+      fetch('/saveFile?file=' + encodeURIComponent(fileName), { 
+          method: 'PUT',
+          headers: { 'Content-Type': 'text/plain' },
+          body: fileContent
+      }).then(response => response.text())
+        .then(result => {
+            console.log("Response:", result);
+            alert(result); 
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error saving file: " + error);
+        });
+    }
+
+    function uploadImage() {
+      var fileInput = document.getElementById('imageUpload');
+      var file = fileInput.files[0];
+      var noteTitle = document.getElementById('header').innerText;
+      if (!file) {
+        alert("Please select an image to upload.");
+        return;
+      }
+
+      var formData = new FormData();
+      formData.append('file', file);
+      formData.append('noteTitle', noteTitle);
+
+      fetch('/uploadImage', {
+        method: 'POST',
+        body: formData
+      }).then(response => response.text())
+        .then(result => {
+            console.log("Response:", result);
+            alert(result);
+            // Optionally, you can reload the page or update the imagesContainer to show the new image
+            displayImages(noteTitle);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error uploading image: " + error);
+        });
     }
   </script>
 

@@ -15,9 +15,9 @@ public class Model
   // The example code in this class should be replaced by your Model class code.
   // The data should be stored in a suitable data structure.
 
-  public List<String> getPatientNames()
+  public List<String> getNoteNames()
   {
-    return readFile("data/NoteNames.csv");
+    return readFile("src\\main\\webapp\\NoteData\\NoteNames.json");
   }
 
   // This method illustrates how to read csv data from a file.
